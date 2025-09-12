@@ -16,7 +16,7 @@ func Logger() gin.HandlerFunc {
 			c.Next()
 			latency := time.Since(start)
 
-			fmt.Print("took ", latency, " for end point ", path)
+			fmt.Println("took ", latency, " for end point ", path)
 			//more logggers
 
 		} else {

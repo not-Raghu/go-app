@@ -1,0 +1,47 @@
+package api
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/not-raghu/goober/controllers/authentication"
+	"github.com/not-raghu/goober/controllers/test"
+	"github.com/not-raghu/goober/middleware"
+)
+
+func Api(router *gin.Engine) {
+
+	//midddleware
+	router.Use(middleware.Logger(), middleware.ServerError(), gin.Recovery())
+
+	api := router.Group("/api")
+	{
+		v1 := api.Group("/v1")
+		{
+			auth := v1.Group("/auth")
+			{
+				auth.POST("/register", authentication.Register())
+				// outh
+				auth.POST("/verify-otp")
+				auth.POST("/login")
+				auth.DELETE("/logout")
+				auth.POST("/password/reset")
+			}
+
+			blogs := v1.Group("/blog")
+			{
+
+				blogs.GET("/blogs")
+				blogs.POST("/blogs")
+			}
+		}
+
+	}
+
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{
+			"message": "invalid route",
+		})
+	})
+
+	//test
+	router.GET("/test", test.Test())
+}
