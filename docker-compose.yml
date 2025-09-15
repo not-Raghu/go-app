@@ -1,0 +1,28 @@
+# version: "3.8"
+# services:
+#   postgres:
+#     image: postgres
+#     container_name: blog_db
+#     ports:
+#       - "5432:5432"
+#     environment:
+#       POSTGRES_USER: user
+#       POSTGRES_PASSWORD: passwrod
+#       POSTGRES_DB: db
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+# volumes:
+#   postgres_data:
+
+version: "3.8"
+services:
+  database:
+    image: "postgres:latest"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: default_database
+    volumes:
+      - ${PWD}/db-data/:/var/lib/postgresql/data/
