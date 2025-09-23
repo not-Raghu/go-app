@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -13,11 +15,15 @@ var (
 )
 
 func InitRedis() *redis.Client {
+
+	db, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
+	maxtriesdb, _ := strconv.Atoi(os.Getenv("REDIS_MAX_TRIES"))
+
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:       "localhost:6379",
-		Password:   "",
-		DB:         0,
-		MaxRetries: 3,
+		Addr:       os.Getenv("REDIS_ADDR"),
+		Password:   os.Getenv("REDIS_PASS"),
+		DB:         db,
+		MaxRetries: maxtriesdb,
 	})
 
 	_, err := RedisClient.Ping(Ctx).Result()

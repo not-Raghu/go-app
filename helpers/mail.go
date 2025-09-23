@@ -21,7 +21,6 @@ func SendMail() error {
 	err := smtp.SendMail(host+":"+port, auth, from, toList, body)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
 	}
 	fmt.Println("Successfully sent mail to all user in toList")
 	return nil

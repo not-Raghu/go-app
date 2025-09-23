@@ -2,8 +2,11 @@ package authentication
 
 import (
 	"crypto/rand"
+	"fmt"
 	"io"
 	"net/http"
+	"net/smtp"
+	"os"
 	"regexp"
 	"time"
 
@@ -51,6 +54,8 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
+		go sendOtpMail(json.Email, otp)
+
 		c.JSON(200, gin.H{
 			"message": "otp sent to your mail, check it and enter that",
 		})
@@ -58,9 +63,22 @@ func Register() gin.HandlerFunc {
 
 }
 
-func validEmail(e string) bool {
-	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	return emailRegex.MatchString(e)
+func sendOtpMail(to string, otp string) {
+	from := os.Getenv("MAIL")
+	password := os.Getenv("MAILPASS")
+
+	host := os.Getenv("SMTPHOST")
+	port := os.Getenv("SMTPPORT")
+
+	msg := []byte("Subject: OTP FOR GOBBER!\r\n" + "\r\n" + "YOUR OTP TO REGISTER INTO GOBBER IS " + otp + ".\r\n" + "note that this otp expires in 10 mins" + ".\r\n")
+
+	auth := smtp.PlainAuth("", from, password, host)
+
+	err := smtp.SendMail(host+":"+port, auth, from, []string{to}, []byte(msg))
+
+	if err != nil {
+		fmt.Println("error sending mail", err)
+	}
 }
 
 func generateOtp(length int) (string, error) {
@@ -79,8 +97,9 @@ func generateOtp(length int) (string, error) {
 	return string(buffer), nil
 }
 
-func sendMail() {
-
+func validEmail(e string) bool {
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return emailRegex.MatchString(e)
 }
 
 func validPass(p string) bool {

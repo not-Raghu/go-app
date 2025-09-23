@@ -9,7 +9,7 @@ import (
 )
 
 type verifyOtp struct {
-	Email string `json::"email"`
+	Email string `json:"email"`
 	Otp   string `json:"otp"`
 }
 
