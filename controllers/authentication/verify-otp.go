@@ -28,7 +28,7 @@ func VerifyOtp() gin.HandlerFunc {
 
 		if otp == json.Otp {
 			c.JSON(400, gin.H{
-				"error": "incorrect otp sent",
+				"error": "incorrect otp sent,please enter right otp",
 			})
 			return
 		}

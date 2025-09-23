@@ -3,6 +3,7 @@ package db
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -12,11 +13,7 @@ import (
 
 //what is life
 
-type Repository struct {
-	Db *gorm.DB
-}
-
-var Dbase *Repository
+var Db *gorm.DB
 
 func ConnectDb() {
 
@@ -34,18 +31,43 @@ func ConnectDb() {
 		log.Fatal("couldn't connect to the database")
 	}
 
-	Dbase = &Repository{Db: db}
+	Db = db
 }
 
+// logging options for gorm
 func Logger() logger.Interface {
+	logLevel := logger.Error
+
+	switch os.Getenv("GORM_LOG_LEVEL") {
+	case "silent":
+		logLevel = logger.Silent
+	case "warn":
+		logLevel = logger.Warn
+	case "info":
+		logLevel = logger.Info
+	}
+
+	slowThreshold := 500 * time.Millisecond
+
+	if os.Getenv("GORM_SLOWTHRESHOLD") != "" {
+		threshold, _ := strconv.Atoi(os.Getenv("GORM_SLOWTHRESHOLD"))
+		slowThreshold = time.Duration(threshold) * time.Millisecond
+	}
+
+	colorful := true
+
+	if os.Getenv("GORM_LOGGER_COLORFUL") != "" {
+		colorful, _ = strconv.ParseBool(os.Getenv("GORM_LOGGER_COLORFUL"))
+	}
+
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
-			SlowThreshold:             time.Second,   // Slow SQL threshold
-			LogLevel:                  logger.Silent, // Log level
-			IgnoreRecordNotFoundError: true,          // Ignore ErrRecordNotFound error for logger
-			ParameterizedQueries:      true,          // Don't include params in the SQL log
-			Colorful:                  false,         // Disable color
+			SlowThreshold:             slowThreshold,
+			LogLevel:                  logLevel,
+			IgnoreRecordNotFoundError: false,
+			ParameterizedQueries:      true,
+			Colorful:                  colorful,
 		},
 	)
 

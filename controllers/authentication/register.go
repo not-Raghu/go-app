@@ -15,11 +15,13 @@ import (
 )
 
 type register struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func Register() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		var json register
 
 		if err := c.ShouldBindJSON(&json); err != nil {
@@ -35,6 +37,15 @@ func Register() gin.HandlerFunc {
 			})
 			return
 		}
+
+		if ok := validPass(json.Password); !ok {
+			c.JSON(400, gin.H{
+				"error": "bad password",
+			})
+			return
+		}
+
+		//check in db for email if already taken.
 
 		otp, err := generateOtp(6)
 
@@ -60,7 +71,6 @@ func Register() gin.HandlerFunc {
 			"message": "otp sent to your mail, check it and enter that",
 		})
 	}
-
 }
 
 func sendOtpMail(to string, otp string) {
@@ -103,16 +113,15 @@ func validEmail(e string) bool {
 }
 
 func validPass(p string) bool {
-	//for now a simple password validation of length
-	//regex:  ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$    , Should contain at least a capital letter
 
-	// Should contain at least a small letter
-	// Should contain at least a number
-	// Should contain at least a special character
-	// And minimum length
+	hasLower := regexp.MustCompile(`[a-z]`).MatchString(p)
+	hasUpper := regexp.MustCompile(`[A-Z]`).MatchString(p)
+	hasNumber := regexp.MustCompile(`[0-9]`).MatchString(p)
+	hasSpecial := regexp.MustCompile(`[!@#\$%\^&\*]`).MatchString(p)
 
-	if p == "" || len(p) <= 6 {
+	if !hasLower || !hasUpper || !hasNumber || !hasSpecial || len(p) < 8 {
 		return false
 	}
+
 	return true
 }
