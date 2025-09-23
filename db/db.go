@@ -16,7 +16,9 @@ type Repository struct {
 	Db *gorm.DB
 }
 
-func ConnectDb() *Repository {
+var Dbase *Repository
+
+func ConnectDb() {
 
 	connStr := os.Getenv("DATABASE_URL")
 
@@ -32,9 +34,7 @@ func ConnectDb() *Repository {
 		log.Fatal("couldn't connect to the database")
 	}
 
-	database := Repository{Db: db}
-	return &database
-
+	Dbase = &Repository{Db: db}
 }
 
 func Logger() logger.Interface {

@@ -22,8 +22,10 @@ func main() {
 
 	godotenv.Load(".env")
 
-	c := middleware.CorsConfig()
 	db.ConnectDb()
+	db.InitRedis()
+
+	c := middleware.CorsConfig()
 	ginMode := os.Getenv("GIN_MODE")
 	gin.SetMode(ginMode)
 
