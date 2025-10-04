@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/not-raghu/goober/db"
+	"github.com/not-raghu/go-app/db"
 )
 
 type verifyOtp struct {
@@ -26,12 +26,16 @@ func VerifyOtp() gin.HandlerFunc {
 
 		otp := db.RedisClient.Get(db.Ctx, json.Email).Val()
 
-		if otp == json.Otp {
+		if otp != json.Otp {
 			c.JSON(400, gin.H{
 				"error": "incorrect otp sent,please enter right otp",
 			})
 			return
 		}
+
+		c.JSON(200, gin.H{
+			"message": "valid otp",
+		})
 
 	}
 }

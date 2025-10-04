@@ -11,8 +11,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-//what is life
-
+// what is life
 var Db *gorm.DB
 
 func ConnectDb() {

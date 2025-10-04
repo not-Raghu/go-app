@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/not-raghu/goober/db"
+	"github.com/not-raghu/go-app/db"
 )
 
 type register struct {

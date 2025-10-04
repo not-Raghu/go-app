@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/not-raghu/goober/api"
-	"github.com/not-raghu/goober/db"
-	"github.com/not-raghu/goober/middleware"
+	"github.com/not-raghu/go-app/api"
+	"github.com/not-raghu/go-app/db"
+	"github.com/not-raghu/go-app/middleware"
 )
 
 // special functions

@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/not-raghu/goober/controllers/authentication"
-	"github.com/not-raghu/goober/controllers/test"
-	"github.com/not-raghu/goober/middleware"
+	"github.com/not-raghu/go-app/controllers/authentication"
+	"github.com/not-raghu/go-app/controllers/test"
+	"github.com/not-raghu/go-app/middleware"
 )
 
 func Api(router *gin.Engine) {

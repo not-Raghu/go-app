@@ -1,39 +1,45 @@
-# version: "3.8"
-# services:
-#   postgres:
-#     image: postgres
-#     container_name: blog_db
-#     ports:
-#       - "5432:5432"
-#     environment:
-#       POSTGRES_USER: user
-#       POSTGRES_PASSWORD: passwrod
-#       POSTGRES_DB: db
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data
-# volumes:
-#   postgres_data:
-
 version: "3.8"
+
 services:
-ervices:
-  postgres:
-    image: "postgres:16"
-    container_name: my_postgres_db
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: default_database
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    restart: unless-stopped
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
   redis:
-    image: "redis:7"
-    container_name: redis-service
+    container_name: redis_service
+    image: redis
+    restart: always
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    restart: unless-stopped
+    networks:
+      - app-network
+
+  adminer:
+    container_name: postgres_client
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

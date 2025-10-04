@@ -1,4 +1,4 @@
-module github.com/not-raghu/goober
+module github.com/not-raghu/go-app
 
 go 1.25
 
