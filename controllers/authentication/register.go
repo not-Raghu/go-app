@@ -2,8 +2,10 @@ package authentication
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -12,6 +14,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/not-raghu/go-app/db"
+	"github.com/not-raghu/go-app/models"
+	"gorm.io/gorm"
 )
 
 type register struct {
@@ -45,7 +49,15 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
-		//check in db for email if already taken.
+		//this is a fresh email
+		user, ok := checkUserInDb(json.Email)
+
+		if ok || user != nil {
+			c.JSON(404, gin.H{
+				"error": "email already in use",
+			})
+			return
+		}
 
 		otp, err := generateOtp(6)
 
@@ -71,6 +83,21 @@ func Register() gin.HandlerFunc {
 			"message": "otp sent to your mail, check it and enter that",
 		})
 	}
+}
+
+func checkUserInDb(email string) (*models.User, bool) {
+	var user models.User
+	result := db.Db.Where("email = ?", email).First(&user)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, false
+	} else if result.Error != nil {
+		log.Println("DB error:", result.Error)
+		return nil, false
+	}
+
+	return &user, true
+
 }
 
 func sendOtpMail(to string, otp string) {

@@ -27,7 +27,7 @@ services:
     networks:
       - app-network
 
-  adminer:
+  adminer: #put host as postgres_db
     container_name: postgres_client
     image: adminer
     restart: always

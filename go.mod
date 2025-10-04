@@ -4,9 +4,9 @@ go 1.25
 
 require (
 	github.com/gin-gonic/gin v1.11.0
+	github.com/goombaio/namegenerator v0.0.0-20181006234301-989e774b106e
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.14.0
-	golang.org/x/time v0.13.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.0
 )
