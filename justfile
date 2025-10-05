@@ -11,7 +11,10 @@ dflush:
     @docker compose down -v
 migrate:
     @echo "running db migration"
-    @go run migrate/migrate.go
+    @go run migrate/*.go
+seed:
+    @echo "seeding database"
+    @go run seed.go
 run:
     @echo "running the app"
     @go run main.go

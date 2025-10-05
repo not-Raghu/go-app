@@ -27,7 +27,7 @@ services:
     networks:
       - app-network
 
-  adminer: #put host as postgres_db
+  adminer: #put host as postgres_db #also issues with reloading on migration on running container(pruning volume doesn't work on a single container)
     container_name: postgres_client
     image: adminer
     restart: always

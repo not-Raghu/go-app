@@ -14,7 +14,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/not-raghu/go-app/db"
+	"github.com/not-raghu/go-app/helpers"
 	"github.com/not-raghu/go-app/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -42,14 +44,6 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
-		if ok := validPass(json.Password); !ok {
-			c.JSON(400, gin.H{
-				"error": "bad password",
-			})
-			return
-		}
-
-		//this is a fresh email
 		user, ok := checkUserInDb(json.Email)
 
 		if ok || user != nil {
@@ -58,6 +52,14 @@ func Register() gin.HandlerFunc {
 			})
 			return
 		}
+
+		if ok := validPass(json.Password); !ok {
+			c.JSON(400, gin.H{
+				"error": "bad password",
+			})
+			return
+		}
+		//here only write to the database and make isverified true or false;
 
 		otp, err := generateOtp(6)
 
@@ -69,10 +71,23 @@ func Register() gin.HandlerFunc {
 		}
 
 		status := db.RedisClient.Set(db.Ctx, json.Email, otp, 10*time.Minute)
+		hashedPass, err := bcrypt.GenerateFromPassword([]byte(json.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"error": "error generating hash",
+			})
+			return
+		}
+
+		db.Db.Create(&models.User{
+			Name:     helpers.GeneateNames(),
+			Email:    json.Email,
+			Password: string(hashedPass),
+		})
 
 		if status.Err() != nil {
 			c.JSON(400, gin.H{
-				"error": "failed to set otp in redis",
+				"error": "failed setting up otp",
 			})
 			return
 		}
