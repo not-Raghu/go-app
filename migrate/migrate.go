@@ -6,12 +6,23 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/not-raghu/go-app/helpers"
 	"github.com/not-raghu/go-app/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var Db *gorm.DB
+var users = []models.User{
+	{
+		Email:    "alice@example.com",
+		Password: "password123",
+	},
+	{
+		Email:    "bob@example.com",
+		Password: "password456",
+	},
+}
 
 func main() {
 
@@ -35,7 +46,28 @@ func main() {
 		log.Fatal("failed to do database migrations.")
 	}
 
-	Db = db
-
 	fmt.Println("database migraion succesfulll")
+
+	if len(os.Args) > 1 && os.Args[len(os.Args)-1] == "seed" {
+		fmt.Println("seeding database")
+
+		for i := range users {
+			hashPass, err := bcrypt.GenerateFromPassword([]byte(users[i].Password), bcrypt.DefaultCost)
+
+			if err != nil {
+				log.Printf("error hashing password")
+				continue
+			}
+
+			db.Create(&models.User{
+				Name:     helpers.GeneateNames(),
+				Email:    users[i].Email,
+				Password: string(hashPass),
+			})
+		}
+
+		fmt.Println("seeded database")
+		return
+	}
+
 }

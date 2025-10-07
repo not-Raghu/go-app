@@ -71,6 +71,13 @@ func Register() gin.HandlerFunc {
 		}
 
 		status := db.RedisClient.Set(db.Ctx, json.Email, otp, 10*time.Minute)
+		if status.Err() != nil {
+			c.JSON(400, gin.H{
+				"error": "failed setting up otp",
+			})
+			return
+		}
+
 		hashedPass, err := bcrypt.GenerateFromPassword([]byte(json.Password), bcrypt.DefaultCost)
 		if err != nil {
 			c.JSON(400, gin.H{
@@ -79,20 +86,12 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
+		go sendOtpMail(json.Email, otp)
 		db.Db.Create(&models.User{
 			Name:     helpers.GeneateNames(),
 			Email:    json.Email,
 			Password: string(hashedPass),
 		})
-
-		if status.Err() != nil {
-			c.JSON(400, gin.H{
-				"error": "failed setting up otp",
-			})
-			return
-		}
-
-		go sendOtpMail(json.Email, otp)
 
 		c.JSON(200, gin.H{
 			"message": "otp sent to your mail, check it and enter that",

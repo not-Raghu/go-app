@@ -50,14 +50,12 @@ func VerifyOtp() gin.HandlerFunc {
 			}
 		}
 
-		if otp == json.Otp {
-			user.Is_Verified = true
-		}
+		user.Is_Verified = true
 
 		db.Db.Save(&user)
 
 		c.JSON(200, gin.H{
-			"message": "valid otp",
+			"message": "user created and verified",
 		})
 
 	}
