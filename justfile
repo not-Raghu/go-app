@@ -21,6 +21,9 @@ run:
 rundev:
     @echo "running app in dev"
     @air
+# build:
+#     @echo "building app"
+#     @go build -o ./dist 
 # ga:
 #     @echo "git add ."
 

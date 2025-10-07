@@ -1,10 +1,13 @@
-GOBBER
+- Clone the repo: `git clone github.com/not-raghu/go-app`
 
-what is this? I DONT KNOW, share any ideas if you got!
+  **Tip:** If you have just installed [just](https://github.com/casey/just), run:
 
-# TODO
+  - `just dup`
+  - `just migrate`
+  - `just rundev` (for development)
+  - (refer to `justfile` for more commands)
 
-add forgot password
-move the instantiation part to init funciton
+- setup: `docker compose up -d && go run migrate/migrato.go`
 
-add swagger
+- development: `go run main.go` or `air` [anohter compile deamon]
+- build: `go build`
