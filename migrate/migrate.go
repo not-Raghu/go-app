@@ -60,9 +60,10 @@ func main() {
 			}
 
 			db.Create(&models.User{
-				Name:     helpers.GeneateNames(),
-				Email:    users[i].Email,
-				Password: string(hashPass),
+				Name:        helpers.GeneateNames(),
+				Email:       users[i].Email,
+				Password:    string(hashPass),
+				Is_Verified: false,
 			})
 		}
 

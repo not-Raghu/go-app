@@ -44,15 +44,6 @@ func Register() gin.HandlerFunc {
 			return
 		}
 
-		user, ok := checkUserInDb(json.Email)
-
-		if ok || user != nil {
-			c.JSON(404, gin.H{
-				"error": "email already in use",
-			})
-			return
-		}
-
 		if ok := validPass(json.Password); !ok {
 			c.JSON(400, gin.H{
 				"error": "bad password",
@@ -61,41 +52,53 @@ func Register() gin.HandlerFunc {
 		}
 		//here only write to the database and make isverified true or false;
 
-		otp, err := generateOtp(6)
+		user, ok := checkUserInDb(json.Email)
 
-		if err != nil {
+		if user != nil && user.Is_Verified {
 			c.JSON(400, gin.H{
-				"error": "failed to generate otp, try again later",
+				"error": "email already in use",
 			})
 			return
 		}
 
-		status := db.RedisClient.Set(db.Ctx, json.Email, otp, 10*time.Minute)
-		if status.Err() != nil {
-			c.JSON(400, gin.H{
-				"error": "failed setting up otp",
+		if !ok || !user.Is_Verified {
+
+			otp, err := generateOtp(6)
+
+			if err != nil {
+				c.JSON(400, gin.H{
+					"error": "failed to generate otp, try again later",
+				})
+				return
+			}
+
+			status := db.RedisClient.Set(db.Ctx, json.Email, otp, 10*time.Minute)
+			if status.Err() != nil {
+				c.JSON(400, gin.H{
+					"error": "failed setting up otp",
+				})
+				return
+			}
+
+			hashedPass, err := bcrypt.GenerateFromPassword([]byte(json.Password), bcrypt.DefaultCost)
+			if err != nil {
+				c.JSON(400, gin.H{
+					"error": "error generating hash",
+				})
+				return
+			}
+
+			go sendOtpMail(json.Email, otp)
+			db.Db.Create(&models.User{
+				Name:     helpers.GeneateNames(),
+				Email:    json.Email,
+				Password: string(hashedPass),
 			})
-			return
-		}
 
-		hashedPass, err := bcrypt.GenerateFromPassword([]byte(json.Password), bcrypt.DefaultCost)
-		if err != nil {
-			c.JSON(400, gin.H{
-				"error": "error generating hash",
+			c.JSON(200, gin.H{
+				"message": "otp sent to your mail, check it and enter that",
 			})
-			return
 		}
-
-		go sendOtpMail(json.Email, otp)
-		db.Db.Create(&models.User{
-			Name:     helpers.GeneateNames(),
-			Email:    json.Email,
-			Password: string(hashedPass),
-		})
-
-		c.JSON(200, gin.H{
-			"message": "otp sent to your mail, check it and enter that",
-		})
 	}
 }
 
