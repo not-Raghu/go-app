@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -12,17 +13,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-var users = []models.User{
-	{
-		Email:    "alice@example.com",
-		Password: "password123",
-	},
-	{
-		Email:    "bob@example.com",
-		Password: "password456",
-	},
-}
 
 func main() {
 
@@ -49,26 +39,46 @@ func main() {
 	fmt.Println("database migraion succesfulll")
 
 	if len(os.Args) > 1 && os.Args[len(os.Args)-1] == "seed" {
-		fmt.Println("seeding database")
-
-		for i := range users {
-			hashPass, err := bcrypt.GenerateFromPassword([]byte(users[i].Password), bcrypt.DefaultCost)
-
-			if err != nil {
-				log.Printf("error hashing password")
-				continue
-			}
-
-			db.Create(&models.User{
-				Name:        helpers.GeneateNames(),
-				Email:       users[i].Email,
-				Password:    string(hashPass),
-				Is_Verified: false,
-			})
-		}
-
-		fmt.Println("seeded database")
-		return
+		seed(db)
 	}
 
+}
+
+var users = []models.User{
+	{
+		Email:    "alice@example.com",
+		Password: "password123",
+	},
+	{
+		Email:    "bob@example.com",
+		Password: "password456",
+	},
+}
+
+func seed(db *gorm.DB) {
+
+	fmt.Println("seeding database")
+
+	for i := range users {
+		hashPass, err := bcrypt.GenerateFromPassword([]byte(users[i].Password), bcrypt.DefaultCost)
+
+		if err != nil {
+			log.Printf("error hashing password")
+			continue
+		}
+
+		db.Create(&models.User{
+			Name:       helpers.GeneateNames(),
+			Email:      users[i].Email,
+			Password:   string(hashPass),
+			IsVerified: rand.Intn(10) > 5,
+		})
+
+	}
+
+	// for i := range blogs{
+	// db.Create(&models.Blog)
+	// }
+
+	fmt.Println("seeded database")
 }

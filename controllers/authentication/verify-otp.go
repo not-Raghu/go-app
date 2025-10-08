@@ -37,7 +37,7 @@ func VerifyOtp() gin.HandlerFunc {
 
 		var user models.User
 		db.Db.Where(&models.User{Email: json.Email}).First(&user)
-		user.Is_Verified = true
+		user.IsVerified = true
 		db.Db.Save(&user)
 
 		val := db.RedisClient.Del(db.Ctx, json.Email)

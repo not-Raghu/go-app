@@ -3,6 +3,9 @@
 dup:
     @echo "starting docker containers"
     @docker compose up -d
+dstop:
+    @echo "stopping containers"
+    @docker compose stop
 ddown:
     @echo "bringing down containers"
     @docker compose down 
