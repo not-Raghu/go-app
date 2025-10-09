@@ -21,6 +21,8 @@ func Api(router *gin.Engine) {
 				auth.POST("/register", authentication.Register())
 				// outh
 				auth.POST("/verify-otp", authentication.VerifyOtp())
+				auth.POST("/forgot-password", authentication.ForgotPass())
+				auth.POST("/change-password", authentication.ChangePass())
 				auth.POST("/login")
 				auth.DELETE("/logout")
 				auth.POST("/password/reset")
@@ -33,7 +35,7 @@ func Api(router *gin.Engine) {
 				blogs.POST("/blogs")
 			}
 		}
-
+		api.GET("/test", test.Test())
 	}
 
 	router.NoRoute(func(c *gin.Context) {
@@ -43,5 +45,5 @@ func Api(router *gin.Engine) {
 	})
 
 	//test
-	router.GET("/test", test.Test())
+
 }

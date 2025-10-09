@@ -2,42 +2,38 @@ package authentication
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type ChangePassword struct {
-	token    string
-	password string
+	Password string `json:"password"`
+	Otp      string `json:"otp"`
 }
 
 func ChangePass() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json ChangePassword
+		c.ShouldBindBodyWithJSON(&json)
 
-		if c.Header("token") == nil {
-			c.JSON(400,gin.H{
-				"error" : "token not provided",
+		if c.GetHeader("Authorization") == "" {
+			c.JSON(400, gin.H{
+				"error": "no token provideed",
 			})
 			return
 		}
 
-		token, err := jwt.Parse(c.Header["token"][0], func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("There was an error in parsing")
+		fmt.Println(c.GetHeader("Authorization"))
+		tokenbytes := string(c.GetHeader("Authorization")[1])
+		token, err := jwt.Parse(string(tokenbytes), func(token *jwt.Token) (any, error) {
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+
+		if err != nil {
+			fmt.Println(err.Error())
 		}
-		return sampleSecretKey, nil
-	})
-
-		if err := c.ShouldBindBodyWithJSON(&json); err != nil {
-			c.JSON(400, gin.H{"error": "incorrect data fields sent"})
-			return
-		}
-
-
-		jwt.
-		
-
+		fmt.Println(token)
 	}
 }

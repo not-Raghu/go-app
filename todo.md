@@ -9,6 +9,7 @@ add seeding data for blogs
 
 # TODO
 
+add a time of 1 min for otp and then only generate a new otp
 add access and refresh token
 add forgot password
 

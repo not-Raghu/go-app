@@ -95,15 +95,14 @@ func SendOtpMail(to string, otp string, purpose string) {
 	}
 }
 
-func JWTToken(email string, name string) (string, error) {
+func JWTToken(email string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["email"] = email
-	claims["name"] = name
 	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
 
-	tokenstr, err := token.SignedString(os.Getenv("JWT_SECRET"))
+	tokenstr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
 	if err != nil {
 		log.Printf("couldn't not create jwt %s", err.Error())
@@ -113,35 +112,23 @@ func JWTToken(email string, name string) (string, error) {
 	return tokenstr, nil
 }
 
-func ValidateToken(c *gin.Context) (err error) {
-	tokenHeader := c.Request.Header["Token"]
-	if len(tokenHeader) == 0 {
+func Validatejwt(c *gin.Context) {
+	tokenString := c.GetHeader("token")
+
+	if tokenString != "" {
 		c.JSON(400, gin.H{
-			"error": "no token found",
+			"error": "no token provided",
 		})
-		return errors.New("no token found")
+		return
 	}
 
-	token, err := jwt.Parse(tokenHeader[0], func(token *jwt.Token) (any, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-
-		if !ok {
-			return nil, errors.New("unauthorized")
-		}
-		// return os.Getenv("JWT_SECRET")
-		return "", nil
-	})
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		return os.Getenv("JWT_SECRET"), nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
-		return err
+		fmt.Println("error parsing token")
 	}
 
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return nil
-	}
-
-	return errors.New("invalid token")
+	fmt.Println(token)
 }

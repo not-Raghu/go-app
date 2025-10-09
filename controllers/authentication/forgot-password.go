@@ -18,26 +18,35 @@ type forgotPass struct {
 func ForgotPass() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json forgotPass
+		// check for the fields
 		if err := c.ShouldBindJSON(&json); err != nil {
 			if err == io.EOF {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect data fields sent"})
 				return
 			}
 		}
-
 		ok := authhelpers.ValidEmail(json.Email)
 		if !ok {
 			c.JSON(200, gin.H{
-				"message": "otp sent to email" + json.Email,
+				"error": "incorrect email",
 			})
 			return
 		}
 
 		user, ok := authhelpers.CheckUserInDb(json.Email)
 
+		//idiot never registered in the first place || maybe a hecker
+		token, err := authhelpers.JWTToken(json.Email)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"error": "couldn't generate token, try again later",
+			})
+			return
+		}
 		if !ok || user == nil {
-			c.JSON(400, gin.H{
-				"error": "user not found in db, register first",
+			c.JSON(200, gin.H{
+				"message": "email sent to " + json.Email,
+				"token":   token,
 			})
 			return
 		}
@@ -51,18 +60,20 @@ func ForgotPass() gin.HandlerFunc {
 			return
 		}
 
+		//send mail
 		go authhelpers.SendOtpMail(json.Email, otp, "forgotpassword")
 
-		key := json.Email + ":forgotpassword"
-		tokenstr, err := authhelpers.JWTToken(user.Email, user.Name)
+		//token
+		tokenstr, err := authhelpers.JWTToken(user.Email)
 
 		if err != nil {
-			c.JSON(400, gin.H{
+			c.JSON(500, gin.H{
 				"error": "couldn't generate token, try again later",
 			})
 			return
 		}
-
+		//set in red
+		key := json.Email + ":forgotpassword"
 		otpstatus := db.RedisClient.Set(db.Ctx, key, otp, 10*time.Minute).Err()
 
 		if otpstatus != nil {
