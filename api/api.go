@@ -38,6 +38,13 @@ func Api(router *gin.Engine) {
 		api.GET("/test", test.Test())
 	}
 
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(500, gin.H{
+			"error": "internal server error",
+		})
+		return
+	})
+
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
 			"message": "invalid route",

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -28,15 +27,6 @@ func main() {
 	db.InitRedis()
 
 	c := middleware.CorsConfig()
-
-	_, err := os.Stat("gin.log")
-
-	if err != nil {
-		_, err := os.Create("gin.log")
-		if err != nil {
-			fmt.Print("error creating file")
-		}
-	}
 
 	reqfile, _ := os.OpenFile("reqfile.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	gin.DefaultWriter = io.MultiWriter(reqfile)

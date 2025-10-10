@@ -9,9 +9,11 @@ add seeding data for blogs
 
 # TODO
 
-add a bash script for creating log files
-add a time of 1 min for otp and then only generate a new otp
-add access and refresh token
-add forgot password
+- fix the log files - [https://github.com/gin-gonic/gin/issues/1376]
+- add a time of 1 min for otp and then only generate a new otp
+- add access and refresh token
+- add forgot password
 
-add swagger
+<!--- not necesary now -->
+
+- add swagger

@@ -20,11 +20,11 @@ seed:
     @go run migrate/migrate.go seed
 run:
     @echo "running the app"
-    @bash smallscript.sh
+    @bash createfile.sh
     @go run main.go
 rundev:
     @echo "running app in dev"
-    @bash smallscript.sh
+    @bash createfile.sh
     @air
 # build:
 #     @echo "building app"
