@@ -10,7 +10,6 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/not-raghu/go-app/db"
 	"github.com/not-raghu/go-app/models"
@@ -100,7 +99,7 @@ func JWTToken(email string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["email"] = email
-	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
+	claims["exp"] = time.Now().Add(1 * time.Second).Unix()
 
 	tokenstr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
@@ -110,25 +109,4 @@ func JWTToken(email string) (string, error) {
 	}
 
 	return tokenstr, nil
-}
-
-func Validatejwt(c *gin.Context) {
-	tokenString := c.GetHeader("token")
-
-	if tokenString != "" {
-		c.JSON(400, gin.H{
-			"error": "no token provided",
-		})
-		return
-	}
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
-		return os.Getenv("JWT_SECRET"), nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-
-	if err != nil {
-		fmt.Println("error parsing token")
-	}
-
-	fmt.Println(token)
 }

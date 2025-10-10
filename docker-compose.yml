@@ -3,7 +3,7 @@ version: "3.8"
 services:
   postgres_db:
     container_name: postgres_db
-    image: postgres:13
+    image: postgres:16
     restart: always
     environment:
       - POSTGRES_USER=user
@@ -18,7 +18,7 @@ services:
 
   redis:
     container_name: redis_service
-    image: redis
+    image: redis:8.2
     restart: always
     ports:
       - "6379:6379"
@@ -29,7 +29,7 @@ services:
 
   adminer: #put host as postgres_db #also issues with reloading on migration on running container(pruning volume doesn't work on a single container)
     container_name: postgres_client
-    image: adminer
+    image: adminer:5.4.0
     restart: always
     ports:
       - "8080:8080"

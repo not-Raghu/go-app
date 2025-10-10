@@ -33,3 +33,9 @@ go.work.sum
 
 tmp/
 dist/
+
+#log files
+error.log
+reqfile.log
+
+.DS_Store

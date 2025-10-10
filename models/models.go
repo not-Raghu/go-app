@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -36,4 +38,8 @@ type Image struct {
 	Url        string
 	Descriptin string
 	Title      string
+}
+
+type RefreshToken struct {
+	Token string `gorm:""`
 }

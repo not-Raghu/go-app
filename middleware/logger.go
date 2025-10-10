@@ -11,13 +11,11 @@ func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.FullPath()
 		if path != "" {
-			//time logging
-			start := time.Now()
-			c.Next()
-			latency := time.Since(start)
 
-			fmt.Println("took ", latency, " for end point ", path)
-			//more logggers
+			s := time.Now()
+			c.Next()
+			latency := time.Since(s)
+			fmt.Println("took " + latency.String() + " - " + path)
 
 		} else {
 			c.Next()

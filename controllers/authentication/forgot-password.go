@@ -36,17 +36,16 @@ func ForgotPass() gin.HandlerFunc {
 		user, ok := authhelpers.CheckUserInDb(json.Email)
 
 		//idiot never registered in the first place || maybe a hecker
-		token, err := authhelpers.JWTToken(json.Email)
-		if err != nil {
-			c.JSON(500, gin.H{
-				"error": "couldn't generate token, try again later",
+		if !ok || user == nil {
+			c.JSON(200, gin.H{
+				"error": "user not found" + json.Email,
 			})
 			return
 		}
-		if !ok || user == nil {
-			c.JSON(200, gin.H{
-				"message": "email sent to " + json.Email,
-				"token":   token,
+
+		if !user.IsVerified {
+			c.JSON(400, gin.H{
+				"error": "user not found",
 			})
 			return
 		}
@@ -62,7 +61,6 @@ func ForgotPass() gin.HandlerFunc {
 
 		//send mail
 		go authhelpers.SendOtpMail(json.Email, otp, "forgotpassword")
-
 		//token
 		tokenstr, err := authhelpers.JWTToken(user.Email)
 
@@ -91,3 +89,6 @@ func ForgotPass() gin.HandlerFunc {
 
 	}
 }
+
+//when he forgets his password, he sends his mail , we send a otp to his mail & token and then
+//he sends his otp and token - verify them from the db

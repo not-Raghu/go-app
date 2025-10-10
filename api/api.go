@@ -10,7 +10,7 @@ import (
 func Api(router *gin.Engine) {
 
 	//midddleware
-	router.Use(middleware.Logger(), middleware.ServerError(), gin.Recovery())
+	router.Use(gin.Logger(), middleware.Logger(), middleware.ServerError(), gin.Recovery())
 
 	api := router.Group("/api")
 	{
@@ -22,7 +22,7 @@ func Api(router *gin.Engine) {
 				// outh
 				auth.POST("/verify-otp", authentication.VerifyOtp())
 				auth.POST("/forgot-password", authentication.ForgotPass())
-				auth.POST("/change-password", authentication.ChangePass())
+				auth.POST("/change-password", authentication.Validatejwt(), authentication.ChangePass())
 				auth.POST("/login")
 				auth.DELETE("/logout")
 				auth.POST("/password/reset")
