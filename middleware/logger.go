@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Logger() gin.HandlerFunc {
+func ReqLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.FullPath()
 		if path != "" {

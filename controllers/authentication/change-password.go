@@ -14,10 +14,12 @@ func ChangePass() gin.HandlerFunc {
 		var json ChangePassword
 		if err := c.ShouldBindBodyWithJSON(&json); err != nil {
 			c.JSON(400, gin.H{
-				"error": "invalid request",
+				"error": "invalid request,send all fields",
 			})
+			c.Error(err)
 			return
 		}
+		c.JSON(200, "ok i will change the password wait")
 
 	}
 }

@@ -10,13 +10,11 @@ func ServerError() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
-		if len(c.Errors) > 0 {
-			err := c.Errors.Last().Err
-
+		if len(c.Errors.ByType(500)) > 0 {
 			c.JSON(http.StatusInternalServerError, map[string]any{
-				"success": false,
-				"message": err.Error(),
+				"error": "internal server error",
 			})
+			c.Abort()
 		}
 
 	}

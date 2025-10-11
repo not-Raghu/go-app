@@ -18,6 +18,7 @@ func Validatejwt() gin.HandlerFunc {
 			c.JSON(400, gin.H{
 				"error": "not authorized",
 			})
+			c.Abort()
 		}
 
 		sentToken := strings.Split(authHeader, " ")[1]
@@ -32,6 +33,7 @@ func Validatejwt() gin.HandlerFunc {
 			c.JSON(400, gin.H{
 				"error": "invalid token",
 			})
+			c.Abort()
 			return
 		}
 

@@ -99,7 +99,7 @@ func JWTToken(email string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["email"] = email
-	claims["exp"] = time.Now().Add(1 * time.Second).Unix()
+	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
 
 	tokenstr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
