@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #create the two required files
-if [ ! -f "reqfile.log" ]; 
+if [ ! -f "req.log" ]; 
 then
-touch reqfile.log
+touch req.log
 fi
 
 if [ ! -f "error.log" ];

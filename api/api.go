@@ -4,16 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/not-raghu/go-app/controllers/authentication"
 	"github.com/not-raghu/go-app/controllers/test"
-	"github.com/not-raghu/go-app/helpers"
 	"github.com/not-raghu/go-app/middleware"
 )
 
 func Api(router *gin.Engine) {
 
 	//midddleware
-	//Using reqlogger for local dev, remove it later
-	router.Use(gin.Logger(), helpers.ErrorLogger(), middleware.ReqLogger(), middleware.ServerError(), gin.Recovery())
-
+	router.Use(gin.Logger(), middleware.ReqLogger(), gin.Recovery())
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -40,14 +37,12 @@ func Api(router *gin.Engine) {
 		api.GET("/test", test.Test())
 	}
 
-	router.GET("/", func(c *gin.Context) {
-
-	})
-
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
 			"message": "invalid route",
 		})
+		return
+
 	})
 
 }

@@ -6,7 +6,7 @@ prolly a blog site like medium to learn go, idk, drop some suggestions if you ha
 
 Tip: If you have [just](https://github.com/casey/just) installed, run:
 
-- USING JUST :
+- METHOD 1 (USING JUST):
 
   - `just dup`
   - `just migrate`
@@ -17,7 +17,7 @@ Tip: If you have [just](https://github.com/casey/just) installed, run:
 
 - METHOD 2
 
-  - `bash createfile.sh`
+  - create log files: `bash createfile.sh`
   - env: `add your environment variables`
   - setup: `docker compose up -d && go run migrate/migrato.go`
 

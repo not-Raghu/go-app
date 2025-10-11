@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/not-raghu/go-app/helpers"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -13,17 +14,18 @@ import (
 
 // what is life
 var Db *gorm.DB
+var Log = helpers.Log
 
 func ConnectDb() {
 
 	connStr := os.Getenv("DATABASE_URL")
 
 	if connStr == "" {
-		log.Fatal("NO DATABASE URL")
+		log.Fatal("no database url")
 	}
 
 	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{
-		Logger: Logger(),
+		Logger: dbLogger(),
 	})
 
 	if err != nil {
@@ -34,7 +36,7 @@ func ConnectDb() {
 }
 
 // logging options for gorm
-func Logger() logger.Interface {
+func dbLogger() logger.Interface {
 	logLevel := logger.Error
 
 	switch os.Getenv("GORM_LOG_LEVEL") {

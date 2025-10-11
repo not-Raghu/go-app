@@ -1,5 +1,3 @@
-#(fuck makefile)
-
 dup:
     @echo "starting docker containers"
     @docker compose up -d
