@@ -20,6 +20,7 @@ func Validatejwt() gin.HandlerFunc {
 				"error": "not authorized",
 			})
 			c.AbortWithError(400, errors.New("not authorized"))
+			return
 		}
 
 		sentToken := strings.Split(authHeader, " ")[1]

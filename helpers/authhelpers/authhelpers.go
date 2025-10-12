@@ -81,7 +81,10 @@ func SendOtpMail(to string, otp string, purpose string) error {
 		{
 			msg = []byte("Subject: PASSWORD RESET FOR GOBBER!\r\n" + "\r\n" + "OTP TO APPLY FOR CHANGING PASSWORD IS " + otp + ".\r\n" + "note this otp expires in 10 mins" + ".\r\n")
 		}
-
+	default:
+		{
+			msg = []byte("Subject: OTP FOR GOBBER!\r\n" + "\r\n" + "OTP IS" + otp + ".\r\n" + "note this otp expires in 10 mins" + ".\r\n")
+		}
 	}
 
 	auth := smtp.PlainAuth("", from, password, host)
@@ -94,6 +97,7 @@ func SendOtpMail(to string, otp string, purpose string) error {
 	return nil
 }
 
+// change signature and let other endpoints use, JWTToken(email,time,struct{claims[keys]})
 func JWTToken(email string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)

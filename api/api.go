@@ -22,6 +22,7 @@ func Api(router *gin.Engine) {
 				auth.POST("/verify-otp", authentication.Validatejwt(), authentication.VerifyOtp())
 				auth.POST("/forgot-password", authentication.ForgotPass())
 				auth.POST("/change-password", authentication.Validatejwt(), authentication.ChangePass())
+				auth.GET("/resend-otp", authentication.Validatejwt(), authentication.ResendOtp())
 				auth.POST("/login")
 				auth.DELETE("/logout")
 				auth.POST("/password/reset")
