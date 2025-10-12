@@ -9,44 +9,51 @@ import (
 
 func ReqLogger() gin.HandlerFunc {
 	rlog, elog := utils.GetLog()
-	return func(c *gin.Context) {
 
+	return func(c *gin.Context) {
 		c.Next()
 
 		status := c.Writer.Status()
+		method := c.Request.Method
 		path := c.FullPath()
+		clientIP := c.ClientIP()
 
-		if status >= http.StatusBadRequest {
+		if len(c.Errors) > 0 {
+			logEvent := elog.Error().
+				Int("status", status).
+				Str("method", method).
+				Str("path", path).
+				Str("client_ip", clientIP)
 
-			if len(c.Errors) > 0 {
-				logEvent := elog.Error().
-					Int("status", status).
-					Str("method", c.Request.Method).
-					Str("path", path)
-
-				for _, err := range c.Errors {
-					logEvent = logEvent.Err(err.Err)
-				}
-
-				if status >= http.StatusInternalServerError {
-					logEvent.Msg("SERVER ERROR")
-				} else {
-					logEvent.Str("client_ip", c.ClientIP()).
-						Msg("CLIENT ERROR - Bad request/validation failed")
-				}
-
-			} else {
-				elog.Warn().
-					Int("status", status).
-					Str("path", path).
-					Msg("HTTP status error detected, but no Gin error attached.")
+			for _, err := range c.Errors {
+				logEvent = logEvent.Err(err.Err)
 			}
 
-		} else if status >= http.StatusOK && status < http.StatusBadRequest {
-			rlog.Info().
-				Str("path", path).
+			logEvent.Msg("Request failed with errors")
+			return
+		}
+
+		if status >= http.StatusInternalServerError {
+			elog.Error().
 				Int("status", status).
-				Msg("endpoint worked")
+				Str("method", method).
+				Str("path", path).
+				Str("client_ip", clientIP).
+				Msg("Server error")
+		} else if status >= http.StatusBadRequest {
+			elog.Warn().
+				Int("status", status).
+				Str("method", method).
+				Str("path", path).
+				Str("client_ip", clientIP).
+				Msg("Client error")
+		} else {
+			rlog.Info().
+				Int("status", status).
+				Str("method", method).
+				Str("path", path).
+				Str("client_ip", clientIP).
+				Msg("OK")
 		}
 	}
 }

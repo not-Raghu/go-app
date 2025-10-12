@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -22,14 +23,17 @@ func ForgotPass() gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&json); err != nil {
 			if err == io.EOF {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "incorrect data fields sent"})
+				c.AbortWithError(400, err)
 				return
 			}
+
 		}
 		ok := authhelpers.ValidEmail(json.Email)
 		if !ok {
-			c.JSON(200, gin.H{
+			c.JSON(400, gin.H{
 				"error": "incorrect email",
 			})
+			c.AbortWithError(400, errors.New("incorrect email format"))
 			return
 		}
 
@@ -37,9 +41,10 @@ func ForgotPass() gin.HandlerFunc {
 
 		//idiot never registered in the first place || maybe a hecker
 		if !ok || user == nil {
-			c.JSON(200, gin.H{
+			c.JSON(400, gin.H{
 				"error": "user not found" + json.Email,
 			})
+			c.AbortWithError(400, errors.New("user not found"))
 			return
 		}
 
@@ -47,6 +52,7 @@ func ForgotPass() gin.HandlerFunc {
 			c.JSON(400, gin.H{
 				"error": "user not found",
 			})
+			c.AbortWithError(400, errors.New("user not verified"))
 			return
 		}
 
@@ -56,6 +62,7 @@ func ForgotPass() gin.HandlerFunc {
 			c.JSON(500, gin.H{
 				"error": "could not generate otp",
 			})
+			c.AbortWithError(500, err)
 			return
 		}
 
@@ -68,6 +75,7 @@ func ForgotPass() gin.HandlerFunc {
 			c.JSON(500, gin.H{
 				"error": "couldn't generate token, try again later",
 			})
+			c.AbortWithError(500, err)
 			return
 		}
 		//set in red
@@ -78,7 +86,7 @@ func ForgotPass() gin.HandlerFunc {
 			c.JSON(500, gin.H{
 				"error": "internal server error",
 			})
-			log.Printf("redis failed %s", otpstatus)
+			c.AbortWithError(500, otpstatus)
 			return
 		}
 

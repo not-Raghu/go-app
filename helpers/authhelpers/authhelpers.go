@@ -3,7 +3,6 @@ package authhelpers
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"log"
 	"net/smtp"
 	"os"
@@ -65,7 +64,7 @@ func CheckUserInDb(email string) (*models.User, bool) {
 
 }
 
-func SendOtpMail(to string, otp string, purpose string) {
+func SendOtpMail(to string, otp string, purpose string) error {
 	from := os.Getenv("MAIL")
 	password := os.Getenv("MAILPASS")
 
@@ -90,8 +89,9 @@ func SendOtpMail(to string, otp string, purpose string) {
 	err := smtp.SendMail(host+":"+port, auth, from, []string{to}, []byte(msg))
 
 	if err != nil {
-		fmt.Println("error sending mail", err)
+		return err
 	}
+	return nil
 }
 
 func JWTToken(email string) (string, error) {

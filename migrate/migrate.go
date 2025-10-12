@@ -68,7 +68,7 @@ func seed(db *gorm.DB) {
 		}
 
 		db.Create(&models.User{
-			Name:       helpers.GeneateNames(),
+			Name:       helpers.GenerateNames(),
 			Email:      users[i].Email,
 			Password:   string(hashPass),
 			IsVerified: rand.Intn(10) > 5,

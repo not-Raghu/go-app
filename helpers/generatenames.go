@@ -6,7 +6,7 @@ import (
 	"github.com/goombaio/namegenerator"
 )
 
-func GeneateNames() string {
+func GenerateNames() string {
 	seed := time.Now().UTC().UnixNano()
 	nameGenerator := namegenerator.NewNameGenerator(seed)
 

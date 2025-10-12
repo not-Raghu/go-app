@@ -40,6 +40,6 @@ type Image struct {
 	Title      string
 }
 
-type RefreshToken struct {
-	Token string `gorm:""`
-}
+// type RefreshToken struct {
+// 	Token string `gorm:""`
+// }
